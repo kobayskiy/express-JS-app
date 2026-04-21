@@ -10,7 +10,21 @@ import { config } from "./config";
 const app = express();
 
 app.use(express.json());
-app.use(cors({ origin: config.clientOrigin, credentials: true }));
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin) return callback(null, true);
+
+      const allowed =
+        origin === config.clientOrigin ||
+        /^http:\/\/localhost:\d+$/.test(origin) ||
+        /^http:\/\/127\.0\.0\.1:\d+$/.test(origin);
+
+      return callback(allowed ? null : new Error("Not allowed by CORS"), allowed);
+    },
+    credentials: true,
+  }),
+);
 
 app.use("/api/auth", authRouter);
 app.use("/api/posts", postsRouter);
