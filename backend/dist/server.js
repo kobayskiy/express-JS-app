@@ -10,8 +10,12 @@ const auth_1 = __importDefault(require("./api/auth"));
 const posts_1 = __importDefault(require("./api/posts"));
 const messages_1 = __importDefault(require("./api/messages"));
 const config_1 = require("./config");
+const requestLogger_1 = require("./middleware/requestLogger");
+const notFound_1 = require("./middleware/notFound");
+const errorHandler_1 = require("./middleware/errorHandler");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
+app.use(requestLogger_1.requestLogger);
 app.use((0, cors_1.default)({
     origin(origin, callback) {
         if (!origin)
@@ -29,6 +33,8 @@ app.use("/api/messages", messages_1.default);
 app.get("/", (req, res) => {
     res.status(200).json({ status: "ok!!!!!!" });
 });
+app.use(notFound_1.notFound);
+app.use(errorHandler_1.errorHandler);
 app.listen(config_1.config.port, () => {
     console.log(`Server running on http://localhost:${config_1.config.port}`);
 });

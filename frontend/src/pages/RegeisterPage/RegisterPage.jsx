@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import './RegisterPage.css'
-import { apiRequest, clearToken, getToken, setToken } from '../../lib/api'
+import { api, clearToken, getToken, setToken } from '../../lib/api'
 
 function RegisterPage() {
   const [mode, setMode] = useState('register')
@@ -9,23 +9,16 @@ function RegisterPage() {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [posts, setPosts] = useState([])
-  const [messages, setMessages] = useState([])
   const [postTitle, setPostTitle] = useState('')
   const [postContent, setPostContent] = useState('')
-  const [messageText, setMessageText] = useState('')
   const [status, setStatus] = useState('')
   const [loading, setLoading] = useState(false)
 
   const loadProtectedData = async () => {
-    const [meData, postsData, messagesData] = await Promise.all([
-      apiRequest('/auth/me'),
-      apiRequest('/posts'),
-      apiRequest('/messages'),
-    ])
+    const [meData, postsData] = await Promise.all([api.auth.me(), api.posts.list()])
 
     setUser(meData.user)
     setPosts(postsData.posts)
-    setMessages(messagesData.messages)
   }
 
   useEffect(() => {
@@ -45,16 +38,10 @@ function RegisterPage() {
     setStatus('')
 
     try {
-      const path = mode === 'register' ? '/auth/register' : '/auth/login'
-      const body =
+      const data =
         mode === 'register'
-          ? { username, email, password }
-          : { email, password }
-
-      const data = await apiRequest(path, {
-        method: 'POST',
-        body: JSON.stringify(body),
-      })
+          ? await api.auth.register({ username, email, password })
+          : await api.auth.login({ email, password })
 
       setToken(data.token)
       await loadProtectedData()
@@ -71,10 +58,7 @@ function RegisterPage() {
     setStatus('')
 
     try {
-      await apiRequest('/posts', {
-        method: 'POST',
-        body: JSON.stringify({ title: postTitle, content: postContent }),
-      })
+      await api.posts.create({ title: postTitle, content: postContent })
       setPostTitle('')
       setPostContent('')
       await loadProtectedData()
@@ -84,38 +68,11 @@ function RegisterPage() {
     }
   }
 
-  const handleCreateMessage = async (event) => {
-    event.preventDefault()
-    setStatus('')
-
-    try {
-      await apiRequest('/messages', {
-        method: 'POST',
-        body: JSON.stringify({ text: messageText }),
-      })
-      setMessageText('')
-      await loadProtectedData()
-      setStatus('Сообщение создано')
-    } catch (error) {
-      setStatus(error.message)
-    }
-  }
-
   const handleDeletePost = async (id) => {
     try {
-      await apiRequest(`/posts/${id}`, { method: 'DELETE' })
+      await api.posts.remove(id)
       await loadProtectedData()
       setStatus('Пост удалён')
-    } catch (error) {
-      setStatus(error.message)
-    }
-  }
-
-  const handleDeleteMessage = async (id) => {
-    try {
-      await apiRequest(`/messages/${id}`, { method: 'DELETE' })
-      await loadProtectedData()
-      setStatus('Сообщение удалено')
     } catch (error) {
       setStatus(error.message)
     }
@@ -125,7 +82,6 @@ function RegisterPage() {
     clearToken()
     setUser(null)
     setPosts([])
-    setMessages([])
     setStatus('Вы вышли из аккаунта')
   }
 
@@ -181,40 +137,6 @@ function RegisterPage() {
                         type="button"
                         className="register-button register-button--danger"
                         onClick={() => handleDeletePost(post.id)}
-                      >
-                        Удалить
-                      </button>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="register-section">
-              <h2 className="register-section-title">Создать сообщение</h2>
-              <form className="register-form" onSubmit={handleCreateMessage}>
-                <textarea
-                  value={messageText}
-                  onChange={(e) => setMessageText(e.target.value)}
-                  required
-                  className="register-input register-textarea"
-                  placeholder="Текст сообщения"
-                />
-                <button type="submit" className="register-button">
-                  Создать сообщение
-                </button>
-              </form>
-
-              <div className="register-list">
-                {messages.map((message) => (
-                  <article key={message.id} className="register-item">
-                    <p>{message.text}</p>
-                    <span>Автор: {message.author.username}</span>
-                    {message.author.id === user.id ? (
-                      <button
-                        type="button"
-                        className="register-button register-button--danger"
-                        onClick={() => handleDeleteMessage(message.id)}
                       >
                         Удалить
                       </button>

@@ -39,3 +39,58 @@ export async function apiRequest(path, options = {}) {
   return data
 }
 
+export const endpoints = {
+  auth: {
+    register: () => `/auth/register`,
+    login: () => `/auth/login`,
+    me: () => `/auth/me`,
+  },
+  posts: {
+    list: () => `/posts`,
+    byId: (id) => `/posts/${id}`,
+  },
+}
+
+export const api = {
+  auth: {
+    async register({ username, email, password }) {
+      return apiRequest(endpoints.auth.register(), {
+        method: 'POST',
+        body: JSON.stringify({ username, email, password }),
+      })
+    },
+    async login({ email, password }) {
+      return apiRequest(endpoints.auth.login(), {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
+      })
+    },
+    async me() {
+      return apiRequest(endpoints.auth.me(), { method: 'GET' })
+    },
+  },
+  posts: {
+    async list() {
+      return apiRequest(endpoints.posts.list(), { method: 'GET' })
+    },
+    async get(id) {
+      return apiRequest(endpoints.posts.byId(id), { method: 'GET' })
+    },
+    async create({ title, content }) {
+      return apiRequest(endpoints.posts.list(), {
+        method: 'POST',
+        body: JSON.stringify({ title, content }),
+      })
+    },
+    async update(id, patch) {
+      return apiRequest(endpoints.posts.byId(id), {
+        method: 'PUT',
+        body: JSON.stringify(patch),
+      })
+    },
+    async remove(id) {
+      return apiRequest(endpoints.posts.byId(id), { method: 'DELETE' })
+    },
+  },
+}
+
