@@ -1,5 +1,7 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
+import { createServer } from "http";
+import { Server } from "socket.io";
 // import { pool } from "./db";
 
 import authRouter from "./api/auth";
@@ -9,6 +11,7 @@ import { config } from "./config";
 import { requestLogger } from "./middleware/requestLogger";
 import { notFound } from "./middleware/notFound";
 import { errorHandler } from "./middleware/errorHandler";
+import { registerSupportHandlers } from "./socket/supportSocket";
 
 const app = express();
 
@@ -41,6 +44,18 @@ app.get("/", (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
-app.listen(config.port, () => {
+const httpServer = createServer(app);
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: config.clientOrigin,
+    credentials: true,
+    methods: ["GET", "POST"],
+  },
+});
+
+registerSupportHandlers(io);
+
+httpServer.listen(config.port, () => {
   console.log(`Server running on http://localhost:${config.port}`);
 });

@@ -24,10 +24,16 @@ router.post("/login", async function (req: Request, res: Response) {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ error: "Invalid credentials" });
 
-    const token = signToken({ userId: user.id });
+    const token = signToken({ userId: user.id, role: user.role });
     return res.status(200).json({
       token,
-      user: { id: user.id, username: user.username, email: user.email, createdAt: user.createdAt },
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        createdAt: user.createdAt,
+      },
     });
   } catch {
     return res.status(500).json({ error: "Internal error" });
@@ -39,7 +45,7 @@ router.get("/me", requireAuth, async function (req: AuthedRequest, res: Response
     const userId = req.user!.id;
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, username: true, email: true, createdAt: true },
+      select: { id: true, username: true, email: true, role: true, createdAt: true },
     });
     if (!user) return res.status(404).json({ error: "Not found" });
     return res.status(200).json({ user });
@@ -64,10 +70,10 @@ router.post(
 
       const hashedPass = await hashPass(password);
       const newUser = await prisma.user.create({
-        data: { username, email, password: hashedPass },
-        select: { id: true, username: true, email: true, createdAt: true },
+        data: { username, email, password: hashedPass, role: "USER" },
+        select: { id: true, username: true, email: true, role: true, createdAt: true },
       });
-      const token = signToken({ userId: newUser.id });
+      const token = signToken({ userId: newUser.id, role: newUser.role });
       return res.status(201).json({ token, user: newUser });
     } catch {
       return res.status(500).json({ error: "Internal error" });

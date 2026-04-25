@@ -1,5 +1,5 @@
 import express, { type Request, type Response } from "express";
-import { requireAuth, type AuthedRequest } from "../middleware/auth";
+import { requireAuth, requireRoles, type AuthedRequest } from "../middleware/auth";
 import {
   createPost,
   deletePost,
@@ -34,7 +34,7 @@ router.get("/:id", async function (req: AuthedRequest, res: Response) {
   }
 });
 
-router.post("/", async function (req: AuthedRequest, res: Response) {
+router.post("/", requireRoles(["USER"]), async function (req: AuthedRequest, res: Response) {
   try {
     const userId = req.user!.id;
     const { title, content } = (req.body ?? {}) as { title?: string; content?: string };

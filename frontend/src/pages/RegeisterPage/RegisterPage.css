@@ -47,6 +47,11 @@
   gap: 16px;
 }
 
+.register-form--inline {
+  flex-direction: row;
+  align-items: center;
+}
+
 .register-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -70,6 +75,83 @@
   flex-direction: column;
   gap: 12px;
   margin-top: 16px;
+}
+
+.register-chat-status {
+  margin: 0 0 10px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.register-chat-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+  margin-bottom: 14px;
+}
+
+.register-ticket-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.register-ticket-item {
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #fff;
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #0f172a;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.register-ticket-item--active {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.register-chat-empty {
+  margin: 0;
+  color: #64748b;
+}
+
+.register-chat-item {
+  border-radius: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+}
+
+.register-chat-item strong,
+.register-chat-item p {
+  margin: 0;
+}
+
+.register-chat-item p {
+  margin-top: 4px;
+}
+
+.register-chat-item--user {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.register-chat-item--agent {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.register-chat-item--system {
+  border-color: #e2e8f0;
+  background: #f8fafc;
 }
 
 .register-item {
@@ -143,6 +225,11 @@
   box-shadow: 0 12px 20px rgba(220, 38, 38, 0.2);
 }
 
+.register-button--new-ticket {
+  background: linear-gradient(135deg, #0891b2, #0e7490);
+  box-shadow: 0 12px 20px rgba(14, 116, 144, 0.25);
+}
+
 .register-button:hover {
   background: linear-gradient(135deg, #1d4ed8, #1e40af);
 }
@@ -158,6 +245,17 @@
 .register-button:active {
   transform: translateY(1px);
   box-shadow: 0 6px 12px rgba(37, 99, 235, 0.45);
+}
+
+.register-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.register-actions {
+  display: flex;
+  gap: 10px;
 }
 
 .register-switcher {

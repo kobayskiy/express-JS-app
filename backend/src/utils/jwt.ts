@@ -3,6 +3,7 @@ import { config } from "../config";
 
 export type JwtPayload = {
   userId: number;
+  role: "USER" | "AGENT" | "ADMIN";
 };
 
 export function signToken(payload: JwtPayload): string {

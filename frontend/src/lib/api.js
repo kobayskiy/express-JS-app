@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:3000/api'
+export const API_BASE_URL = 'http://localhost:3000'
+const API_URL = `${API_BASE_URL}/api`
 const TOKEN_KEY = 'auth_token'
 
 export function getToken() {
